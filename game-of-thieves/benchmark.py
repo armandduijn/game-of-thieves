@@ -57,7 +57,7 @@ class BaseImplementation(AbstractAlgorithm):
         return GOT.ComputeCentrality(G=self.network, **kwargs)
 
 
-G = library.generateNetwork(N=10, cnType='scale-free', weighted=True)
+G = library.generateNetwork(N=10, cnType='scale-free', weighted=True, seed=0)
 
 # Export a visualization to understand what the GoT is calculating on
 visualize(G, 'graph')

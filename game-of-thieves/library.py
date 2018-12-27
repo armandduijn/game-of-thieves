@@ -76,7 +76,7 @@ def nodesRemovalProcedure(G,nodesSorted):
         noComponents[k]=len(conn)
     return [nodesGiant,noComponents]
 
-def generateNetwork(N,cnType,weighted):
+def generateNetwork(N,cnType,weighted, seed=0):
     # Input:
     #   N - number of nodes
     #   cnType  - network type (i.e. scale-free, small-world, Erdos-Renyi random graph)
@@ -85,17 +85,17 @@ def generateNetwork(N,cnType,weighted):
     #   G - a network with random generated topology acoording with the input parameters
 
     if (cnType == "scale-free"):
-        G = nx.powerlaw_cluster_graph(N, 5, 0.3)
+        G = nx.powerlaw_cluster_graph(N, 5, 0.3, seed=seed)
         while (nx.is_connected(G) == False):
-            G = nx.powerlaw_cluster_graph(N, 5, 0.3)
+            G = nx.powerlaw_cluster_graph(N, 5, 0.3, seed=seed)
     if (cnType == "small-world"):
-        G = nx.newman_watts_strogatz_graph(N, 6, 0.6)
+        G = nx.newman_watts_strogatz_graph(N, 6, 0.6, seed=seed)
         while (nx.is_connected(G) == False):
-            G = nx.newman_watts_strogatz_graph(N, 6, 0.6)
+            G = nx.newman_watts_strogatz_graph(N, 6, 0.6, seed=seed)
     if (cnType == "Erdos-Renyi"):
-        G = nx.fast_gnp_random_graph(N, 0.01)
+        G = nx.fast_gnp_random_graph(N, 0.01, seed=seed)
         while (nx.is_connected(G) == False):
-            G = nx.fast_gnp_random_graph(N, 0.01)
+            G = nx.fast_gnp_random_graph(N, 0.01, seed=seed)
 
     if (weighted):
         G = generateWeightedNetwork(G)

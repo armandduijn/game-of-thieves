@@ -9,14 +9,14 @@ class Thief:
         self.diamond = 0
         self.path = []
 
-    def move(self, G):
+    def move(self, G, lock):
         if self.diamond == 0:
             self.search(G)
 
             if self.position != self.origin:
-                self.take_diamond(G)
+                self.take_diamond(G, lock)
         else:
-            self.back(G)
+            self.back(G, lock)
 
     def search(self, G):
         neighboursList = G[self.position]
@@ -55,8 +55,36 @@ class Thief:
         if (self.origin==self.position):
             self.path=[]
 
-    def take_diamond(self, G):
-        pass
+    def take_diamond(self, G, lock):
+        lock.acquire()
 
-    def back(self, G):
-        pass
+        # Pick-up a vdiamond if the current node has vdiamonds
+        if G.node[self.position]['vdiamonds'] > 0:
+            G.node[self.position]['vdiamonds'] -= 1
+
+            self.diamond = 1
+
+        lock.release()
+
+    def back(self, G, lock):
+        lock.acquire()
+
+        # Update amount of passes on edge
+        current_edge = G.get_edge_data(self.position, self.path[-1])
+        thiefs_passes = current_edge['passes'] + 1
+
+        G.add_edge(self.position, self.path[-1], passes=thiefs_passes)
+
+        # Move the thief to its previously visited node
+        self.position = self.path[-1]
+        del self.path[-1]
+
+        # Update origin node if the thief has returned
+        if self.position == self.origin:
+            self.path = []
+            self.diamond = 0
+            self.position = self.origin
+
+            G.node[self.position]['vdiamonds'] += 1
+
+        lock.release()

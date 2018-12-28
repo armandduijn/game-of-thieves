@@ -9,14 +9,14 @@ class Thief:
         self.diamond = 0
         self.path = []
 
-    def move(self, G, k):
+    def move(self, G):
         if self.diamond == 0:
             self.search(G)
 
             if self.position != self.origin:
                 self.take_diamond(G)
         else:
-            self.back(G, k)
+            self.back(G)
 
     def search(self, G):
         neighboursList = G[self.position]
@@ -58,5 +58,5 @@ class Thief:
     def take_diamond(self, G):
         pass
 
-    def back(self, G, k):
+    def back(self, G):
         pass

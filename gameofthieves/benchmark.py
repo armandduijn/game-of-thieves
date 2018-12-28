@@ -23,31 +23,51 @@ def visualize(G, filename):
     plt.savefig(filename + '.pdf')
 
 
-G = library.generateNetwork(N=10, cnType='scale-free', weighted=True, seed=0)
+def plotResults(x, results):
+    plt.figure(figsize=(5, 5))
 
-# Export a visualization to understand what the GoT is calculating on
-visualize(G, 'graph')
+    for key, values in results.items():
+        plt.plot(x, values, marker='o', label=key)
+
+    plt.legend()
+    plt.xlabel('Nodes')
+    plt.ylabel('Average Duration (s)')
+    plt.savefig('duration.pdf')
+
 
 # Perform GoT algorithm
 settings = {
     'num_thiefs': 3,      # Number of thieves per node
     'num_vdiamonds': 10,  # Number of vdiamonds per node
     'num_epochs': 1000,   # Number of epochs
+    'seed': 0,            # Randomness seed
 }
 
 iterations = 3  # Number of times to run the algorithm
 
-implementations = [
-    BaseImplementation(G),
-    TestImplementation(G),
-]
+search_space = {
+    'n': [10, 20, 50]
+}
 
 results = {}
-for implementation in implementations:
-    name = implementation.__class__.__name__
+for n in search_space.get('n'):
+    G = library.generateNetwork(N=n, cnType='scale-free', weighted=True, seed=settings.get('seed'))
 
-    print('Running %s...' % name)
+    implementations = [
+        BaseImplementation(G),
+        TestImplementation(G),
+    ]
 
-    results[name] = implementation.time(number=iterations, **settings)
+    for implementation in implementations:
+        name = implementation.__class__.__name__
+
+        print('Running %s with n=%d...' % (name, n))
+
+        if not results.get(name):
+            results[name] = []
+
+        results[name].append(implementation.time(number=iterations, **settings))
+
+plotResults(search_space.get('n'), results)
 
 print(results)

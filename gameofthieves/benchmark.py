@@ -1,8 +1,8 @@
-import networkx as nx
-import matplotlib.pyplot as plt
-import library
-
 from algorithms import BaseImplementation, TestImplementation
+
+import library
+import matplotlib.pyplot as plt
+import networkx as nx
 
 
 def visualize(G, filename):
@@ -30,9 +30,9 @@ visualize(G, 'graph')
 
 # Perform GoT algorithm
 settings = {
-    'noThiefs': 3,      # Number of thieves per node
-    'noVDiamonds': 10,  # Number of vdiamonds per node
-    'noEpochs': 1000,   # Number of epochs
+    'num_thiefs': 3,      # Number of thieves per node
+    'num_vdiamonds': 10,  # Number of vdiamonds per node
+    'num_epochs': 1000,   # Number of epochs
 }
 
 iterations = 3  # Number of times to run the algorithm

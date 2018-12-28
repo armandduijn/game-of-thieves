@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
 
+import got
 import timeit
-import GOT
 
 
 class AbstractAlgorithm(ABC):
     def __init__(self, G):
-        self.network = G
+        self.G = G
 
     @abstractmethod
     def execute(self, **kwargs):
@@ -33,9 +33,9 @@ class AbstractAlgorithm(ABC):
 
 class BaseImplementation(AbstractAlgorithm):
     def execute(self, **kwargs):
-        return GOT.ComputeCentrality(G=self.network, **kwargs)
+        return got.compute_centrality(G=self.G, **kwargs)
 
 
 class TestImplementation(AbstractAlgorithm):
     def execute(self, **kwargs):
-        return True
+        return got.compute_centrality_parallel(G=self.G, **kwargs)

@@ -33,6 +33,8 @@ class AbstractAlgorithm(ABC):
 
 class BaseImplementation(AbstractAlgorithm):
     def execute(self, **kwargs):
+        del kwargs['processors']
+
         return got.compute_centrality(G=self.G, **kwargs)
 
 

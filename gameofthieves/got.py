@@ -3,6 +3,7 @@ from thief import Thief
 import networkx as nx
 import numpy as np
 import random
+import logging
 
 from multiprocessing import Pool, Lock
 
@@ -44,7 +45,7 @@ def compute_centrality(G, num_thiefs, num_vdiamonds, num_epochs, seed=0):
                         thiefs.append(Thief(i))
 
 
-def compute_centrality_parallel(G, num_thiefs, num_vdiamonds, num_epochs, seed=0):
+def compute_centrality_parallel(G, num_thiefs, num_vdiamonds, num_epochs, processors, seed=0):
     random.seed(seed)
 
     num_nodes = nx.number_of_nodes(G)
@@ -64,7 +65,7 @@ def compute_centrality_parallel(G, num_thiefs, num_vdiamonds, num_epochs, seed=0
         i += 1
 
     lock = Lock()
-    pool = Pool(processes=2, initializer=initialize_pool, initargs=(lock,))
+    pool = Pool(processes=processors, initializer=initialize_pool, initargs=(lock,))
 
     k = 0
     while k < num_epochs:

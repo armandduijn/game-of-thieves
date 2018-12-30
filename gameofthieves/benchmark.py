@@ -8,6 +8,7 @@ import json
 import hashlib
 import multiprocessing
 
+
 def visualize(G, filename):
     """
     Generates a visualization of the graph
@@ -39,23 +40,30 @@ def plot_results(x, settings, results):
     parameters = ', '.join(parameters)
 
     # Generate graph
-    plt.figure(figsize=(5, 5))
+    fig, ax = plt.subplots(nrows=1, ncols=len(results), sharey=True)
 
-    for key, values in results.items():
-        plt.plot(x, values, marker='o', label=key)
+    if len(results) == 1:
+        ax = [ ax ]
 
-    plt.suptitle('Average Duration of Implementations')
-    plt.title(parameters, fontsize=6)
-    plt.legend()
-    plt.xlabel('Nodes')
-    plt.ylabel('Average Duration (s)')
+    i = 0
+    for network, runs in results.items():
+        for implementation, measurements in runs.items():
+            ax[i].plot(x, measurements, marker='o', label=implementation)
+
+        ax[i].set_title(network)
+        ax[i].set_xlabel('Nodes')
+        ax[i].legend()
+
+        i += 1
+
+    plt.suptitle(parameters, fontsize=6)
+    fig.text(0.04, 0.5, 'Average Duration (s)', va='center', rotation='vertical')
     plt.savefig(filename)
 
     return filename
 
 
 # Setup benchmark
-
 logging.basicConfig(level=logging.INFO)
 
 iterations = 3  # Run each algorithm 3 times
@@ -71,29 +79,33 @@ settings = {
 }
 
 search_space = {
-    'n': [10, 20, 50]
+    'type': ['scale-free'],
+    'n': [10],
 }
 
 results = {}
-for n in search_space.get('n'):
-    logging.info('Generating a network with %d nodes' % n)
+for network in search_space.get('type'):
+    results[network] = {}
 
-    G = library.generateNetwork(N=n, cnType='scale-free', weighted=True, seed=settings.get('seed'))
+    for n in search_space.get('n'):
+        logging.info('Generating a %s network with %d nodes' % (network, n))
 
-    implementations = [
-        BaseImplementation(G),
-        TestImplementation(G),
-    ]
+        G = library.generateNetwork(N=n, cnType=network, weighted=True, seed=settings.get('seed'))
 
-    for implementation in implementations:
-        name = implementation.__class__.__name__
+        implementations = [
+            BaseImplementation(G),
+            TestImplementation(G),
+        ]
 
-        logging.info('Running %s' % name)
+        for implementation in implementations:
+            name = implementation.__class__.__name__
 
-        if not results.get(name):
-            results[name] = []
+            logging.info('Running %s' % name)
 
-        results[name].append(implementation.time(number=iterations, **settings))
+            if not results[network].get(name):
+                results[network][name] = []
+
+            results[network][name].append(implementation.time(number=iterations, **settings))
 
 logging.info('Exporting results')
 

@@ -28,6 +28,9 @@ def compute_centrality(G, num_thiefs, num_vdiamonds, num_epochs, seed=0):
 
     lock = Lock()
 
+    vdiamonds = np.zeros((num_nodes, num_epochs))
+    passes = np.zeros((num_edges, num_epochs))
+
     # Run GOT for a specific number of epochs
     k = 0
     while k < num_epochs:
@@ -43,6 +46,31 @@ def compute_centrality(G, num_thiefs, num_vdiamonds, num_epochs, seed=0):
                 if G.neighbors(i):
                     for j in range(num_thiefs):
                         thiefs.append(Thief(i))
+
+        # Store the amount of vdiamonds from each node at epoch k
+        for i in range(num_nodes):
+            vdiamonds[i, k - 1] = G.node[i]['vdiamonds']
+
+        # Store the number of thieves passes on each edge at epoch k
+        i = 0
+        for edge in G.edges(data=True):
+            passes[i, k - 1] = edge[2]['passes']
+            i += 1
+
+        # TODO: Add converge
+
+    # Compute the rank of nodes and edges
+    mean_vdiamonds = np.mean(vdiamonds[:, :k], axis=1)
+    sorted_nodes = mean_vdiamonds.argsort(axis=0)
+
+    sorted_edges = np.zeros((num_edges, 1, 2))
+    mean_passes = np.mean(passes[:, :k], axis=1)
+    sorted_edges_index = mean_passes.argsort(axis=0)[::-1]
+
+    for i in range(num_edges):
+        sorted_edges[i, 0] = edges[sorted_edges_index[i]]
+
+    return [mean_vdiamonds, sorted_nodes, vdiamonds, mean_passes, sorted_edges, k]
 
 
 def compute_centrality_parallel(G, num_thiefs, num_vdiamonds, num_epochs, processors, seed=0):
@@ -67,6 +95,9 @@ def compute_centrality_parallel(G, num_thiefs, num_vdiamonds, num_epochs, proces
     lock = Lock()
     pool = Pool(processes=processors, initializer=initialize_pool, initargs=(lock,))
 
+    vdiamonds = np.zeros((num_nodes, num_epochs))
+    passes = np.zeros((num_edges, num_epochs))
+
     k = 0
     while k < num_epochs:
         k += 1
@@ -81,6 +112,30 @@ def compute_centrality_parallel(G, num_thiefs, num_vdiamonds, num_epochs, proces
                     for j in range(num_thiefs):
                         thiefs.append(Thief(i))
 
+        # Store the amount of vdiamonds from each node at epoch k
+        for i in range(num_nodes):
+            vdiamonds[i, k - 1] = G.node[i]['vdiamonds']
+
+        # Store the number of thieves passes on each edge at epoch k
+        i = 0
+        for edge in G.edges(data=True):
+            passes[i, k - 1] = edge[2]['passes']
+            i += 1
+
+        # TODO: Add converge
+
+    # Compute the rank of nodes and edges
+    mean_vdiamonds = np.mean(vdiamonds[:, :k], axis=1)
+    sorted_nodes = mean_vdiamonds.argsort(axis=0)
+
+    sorted_edges = np.zeros((num_edges, 1, 2))
+    mean_passes = np.mean(passes[:, :k], axis=1)
+    sorted_edges_index = mean_passes.argsort(axis=0)[::-1]
+
+    for i in range(num_edges):
+        sorted_edges[i, 0] = edges[sorted_edges_index[i]]
+
+    return [mean_vdiamonds, sorted_nodes, vdiamonds, mean_passes, sorted_edges, k]
 
 def initialize_pool(l):
     global lock

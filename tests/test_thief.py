@@ -1,5 +1,4 @@
 from gameofthieves.thief import Thief
-from multiprocessing import Lock
 
 import unittest
 import networkx as nx
@@ -8,8 +7,6 @@ import random
 
 class ThiefTest(unittest.TestCase):
     def setUp(self):
-        self.lock = Lock()
-
         random.seed(0)
 
     def sample_graph(self, num_vdiamonds):
@@ -36,7 +33,7 @@ class ThiefTest(unittest.TestCase):
         G = self.sample_graph(num_vdiamonds=1)
 
         thief = Thief(origin=0)
-        thief.move(G, self.lock)
+        thief.move(G)
 
         self.assertEqual(thief.position, 1)
         self.assertEqual(thief.diamond, 1)
@@ -49,8 +46,8 @@ class ThiefTest(unittest.TestCase):
         G = self.sample_graph(num_vdiamonds=1)
 
         thief = Thief(origin=0)
-        thief.move(G, self.lock)
-        thief.move(G, self.lock)
+        thief.move(G)
+        thief.move(G)
 
         self.assertEqual(thief.position, 0)
         self.assertEqual(thief.diamond, 0)
@@ -64,8 +61,8 @@ class ThiefTest(unittest.TestCase):
         G.node[1]['vdiamonds'] = 0  # The second node has already been robbed
 
         thief = Thief(origin=0)
-        thief.move(G, self.lock)
-        thief.move(G, self.lock)
+        thief.move(G)
+        thief.move(G)
 
         self.assertEqual(thief.position, 2)
         self.assertEqual(thief.diamond, 1)
@@ -81,7 +78,7 @@ class ThiefTest(unittest.TestCase):
         G.add_edge(1, 2, value=2)
 
         thief = Thief(origin=1)
-        thief.move(G, self.lock)  # Move to node 2 because random() = 0.84 > 0.66
+        thief.move(G)  # Move to node 2 because random() = 0.84 > 0.66
 
         self.assertEqual(thief.position, 2)
 
@@ -91,9 +88,9 @@ class ThiefTest(unittest.TestCase):
         thief1 = Thief(origin=0)
         thief2 = Thief(origin=2)
 
-        thief1.move(G, self.lock)  # Thief 1 moves to node 1
-        thief2.move(G, self.lock)  # Thief 2 moves to node 1
-        thief1.move(G, self.lock)  # Thief 1 moves to its origin
+        thief1.move(G)  # Thief 1 moves to node 1
+        thief2.move(G)  # Thief 2 moves to node 1
+        thief1.move(G)  # Thief 1 moves to its origin
 
         self.assertEqual(thief1.position, 0)
         self.assertEqual(thief2.position, 1)
@@ -108,10 +105,10 @@ class ThiefTest(unittest.TestCase):
         thief1 = Thief(origin=0)
         thief2 = Thief(origin=2)
 
-        thief1.move(G, self.lock)  # Thief 1 moves to node 1
-        thief2.move(G, self.lock)  # Thief 2 moves to node 1
-        thief1.move(G, self.lock)  # Thief 1 moves to its origin
-        thief2.move(G, self.lock)  # Thief 1 moves to node 1
+        thief1.move(G)  # Thief 1 moves to node 1
+        thief2.move(G)  # Thief 2 moves to node 1
+        thief1.move(G)  # Thief 1 moves to its origin
+        thief2.move(G)  # Thief 1 moves to node 1
 
         self.assertEqual(thief1.position, 0)
         self.assertEqual(thief2.position, 0)

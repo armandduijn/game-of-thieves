@@ -9,14 +9,42 @@ class Thief:
         self.diamond = 0
         self.path = []
 
-    def move(self, G, lock):
+    def invade(self, G):
+        """
+        Invade a neighbor
+        """
+
+        # A thief can only invade a neighbor if it isn't already carrying a vdiamond
+        if self.diamond == 0:
+            self.search(G)
+
+    def steal(self, G):
+        """
+        Steal a diamond at the current position
+        """
+
+        # A thief can only carry 1 vdiamond at a time
+        # Prevent a thief from stealing his own stash
+        if self.diamond == 0 and self.position != self.origin:
+            self.take_diamond(G)
+
+    def retreat(self, G):
+        """
+        Retreat back to the origin
+        """
+
+        # A thief can only retreat if it has successfully stolen a vdiamond
+        if self.diamond > 0:
+            self.back(G)
+
+    def move(self, G):
         if self.diamond == 0:
             self.search(G)
 
             if self.position != self.origin:
-                self.take_diamond(G, lock)
+                self.take_diamond(G)
         else:
-            self.back(G, lock)
+            self.back(G)
 
     def search(self, G):
         neighboursList = G[self.position]
@@ -55,20 +83,14 @@ class Thief:
         if (self.origin==self.position):
             self.path=[]
 
-    def take_diamond(self, G, lock):
-        lock.acquire()
-
+    def take_diamond(self, G):
         # Pick-up a vdiamond if the current node has vdiamonds
         if G.node[self.position]['vdiamonds'] > 0:
             G.node[self.position]['vdiamonds'] -= 1
 
             self.diamond = 1
 
-        lock.release()
-
-    def back(self, G, lock):
-        lock.acquire()
-
+    def back(self, G):
         # Update amount of passes on edge
         current_edge = G.get_edge_data(self.position, self.path[-1])
         thiefs_passes = current_edge['passes'] + 1
@@ -86,5 +108,3 @@ class Thief:
             self.position = self.origin
 
             G.node[self.position]['vdiamonds'] += 1
-
-        lock.release()

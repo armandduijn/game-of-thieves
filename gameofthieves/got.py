@@ -24,8 +24,6 @@ def compute_centrality(G, num_thiefs, num_vdiamonds, num_epochs, seed=0):
         edges[i] = np.asarray([edge[0], edge[1]])
         i += 1
 
-    lock = Lock()
-
     vdiamonds = np.zeros((num_nodes, num_epochs))
     passes = np.zeros((num_edges, num_epochs))
 
@@ -36,7 +34,7 @@ def compute_centrality(G, num_thiefs, num_vdiamonds, num_epochs, seed=0):
 
         # Make a move for each thief
         for thief in thiefs:
-            thief.move(G, lock)
+            thief.move(G)
 
         # In the first epoch create the thieves for each node
         if k == 1:
@@ -89,8 +87,7 @@ def compute_centrality_parallel(G, num_thiefs, num_vdiamonds, num_epochs, proces
         edges[i] = np.asarray([edge[0], edge[1]])
         i += 1
 
-    lock = Lock()
-    pool = Pool(processes=processors, initializer=initialize_pool, initargs=(lock,))
+    pool = Pool(processes=processors)
 
     vdiamonds = np.zeros((num_nodes, num_epochs))
     passes = np.zeros((num_edges, num_epochs))
@@ -100,7 +97,12 @@ def compute_centrality_parallel(G, num_thiefs, num_vdiamonds, num_epochs, proces
         k += 1
 
         # Move the thieves
-        pool.starmap(walk, [(G, thief) for thief in thiefs])
+        thiefs = pool.starmap(walk, [(G, thief) for thief in thiefs])
+
+        # Make a move for each thief
+        for thief in thiefs:
+            thief.steal(G)
+            thief.retreat(G)
 
         # In the first epoch create the thieves for each node
         if k == 1:
@@ -135,13 +137,10 @@ def compute_centrality_parallel(G, num_thiefs, num_vdiamonds, num_epochs, proces
     return [mean_vdiamonds, sorted_nodes, vdiamonds, mean_passes, sorted_edges, k]
 
 
-def initialize_pool(l):
-    global lock
-    lock = l
-
-
 def walk(G, thief):
-    thief.move(G, lock)
+    thief.invade(G)
+
+    return thief
 
 
 def initialize_graph(G, num_vdiamonds):

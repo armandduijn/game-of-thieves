@@ -1,11 +1,10 @@
+from multiprocessing import Pool, Lock
 from thief import Thief
 
 import networkx as nx
 import numpy as np
 import random
-import logging
 
-from multiprocessing import Pool, Lock
 
 def compute_centrality(G, num_thiefs, num_vdiamonds, num_epochs, seed=0):
     random.seed(seed)
@@ -19,7 +18,6 @@ def compute_centrality(G, num_thiefs, num_vdiamonds, num_epochs, seed=0):
     # Initialize a list with thieves
     thiefs = []
 
-    # TODO: Add description
     edges = np.zeros((num_edges, 2))
     i = 0
     for edge in G.edges(data=True):
@@ -85,7 +83,6 @@ def compute_centrality_parallel(G, num_thiefs, num_vdiamonds, num_epochs, proces
     # Initialize a list with thieves
     thiefs = []
 
-    # TODO: Add description
     edges = np.zeros((num_edges, 2))
     i = 0
     for edge in G.edges(data=True):
@@ -137,29 +134,14 @@ def compute_centrality_parallel(G, num_thiefs, num_vdiamonds, num_epochs, proces
 
     return [mean_vdiamonds, sorted_nodes, vdiamonds, mean_passes, sorted_edges, k]
 
+
 def initialize_pool(l):
     global lock
     lock = l
 
+
 def walk(G, thief):
     thief.move(G, lock)
-
-# def __initialize_threads(num_threads, *args):
-#
-#     for _ in range(num_threads):
-#         worker = Thread(target=__manager, args=args)
-#
-#         worker.setDaemon(True)
-#         worker.start()
-
-
-# def __manager(queue, G, thiefs):
-#
-#     while True:
-#         thief = thiefs[queue.get()]
-#         thief.move(G)
-#
-#         queue.task_done()
 
 
 def initialize_graph(G, num_vdiamonds):

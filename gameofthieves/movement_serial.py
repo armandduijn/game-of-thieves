@@ -7,7 +7,7 @@ class Thief:
         self.position = origin
 
     def move(self):
-        time.sleep(0.001)
+        time.sleep(0.0001)
 
         self.position += 1
 

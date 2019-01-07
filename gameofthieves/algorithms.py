@@ -3,7 +3,8 @@ from abc import ABC, abstractmethod
 import got
 import timeit
 import movement_serial
-import movement_parallel
+import movement_pool
+import movement_batch
 import networkx as nx
 
 
@@ -44,10 +45,19 @@ class BaseImplementation(AbstractAlgorithm):
         return movement_serial.main(n=nx.number_of_nodes(self.G), **kwargs)
 
 
-class TestImplementation(AbstractAlgorithm):
+class PoolImplementation(AbstractAlgorithm):
     def execute(self, **kwargs):
         del kwargs['num_vdiamonds']
         del kwargs['seed']
 
         # return got.compute_centrality_parallel(G=self.G, **kwargs)
-        return movement_parallel.main(n=nx.number_of_nodes(self.G), **kwargs)
+        return movement_pool.main(n=nx.number_of_nodes(self.G), **kwargs)
+
+
+class BatchImplementation(AbstractAlgorithm):
+    def execute(self, **kwargs):
+        del kwargs['num_vdiamonds']
+        del kwargs['seed']
+
+        # return got.compute_centrality_parallel(G=self.G, **kwargs)
+        return movement_batch.main(n=nx.number_of_nodes(self.G), **kwargs)

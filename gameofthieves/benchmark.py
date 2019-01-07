@@ -1,4 +1,4 @@
-from algorithms import BaseImplementation, TestImplementation
+from algorithms import BaseImplementation, PoolImplementation, BatchImplementation
 
 import library
 import matplotlib.pyplot as plt
@@ -94,7 +94,8 @@ for network in search_space.get('type'):
 
         implementations = [
             BaseImplementation(G),
-            TestImplementation(G),
+            PoolImplementation(G),
+            BatchImplementation(G),
         ]
 
         for implementation in implementations:

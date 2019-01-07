@@ -80,7 +80,7 @@ settings = {
 
 search_space = {
     'type': ['scale-free'],
-    'n': [10, 50, 100],
+    'n': [10, 50, 100, 200],
 }
 
 results = {}
